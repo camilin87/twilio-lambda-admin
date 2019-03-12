@@ -1,0 +1,20 @@
+{
+  "name": "twilio-lambda-admin",
+  "version": "1.0.0",
+  "description": "Twilio lambda backend to automate other lambda projects",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camilin87/twilio-lambda-admin.git"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "twilio"
+  ],
+  "author": "@camilin87",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/camilin87/twilio-lambda-admin/issues"
+  },
+  "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme"
+}
