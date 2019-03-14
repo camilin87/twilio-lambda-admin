@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/camilin87/twilio-lambda-admin/issues"
   },
-  "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme"
+  "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme",
+  "scripts": {
+    "start": "node main.js"
+  }
 }
