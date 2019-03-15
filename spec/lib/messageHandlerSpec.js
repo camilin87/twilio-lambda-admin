@@ -1,5 +1,6 @@
 const rfr = require('rfr')
 const messageHandler = rfr('lib/messageHandler')
+const errorCodes = rfr('lib/errorCodes')
 
 describe('messageHandler', function(){
     var handler = null
@@ -75,6 +76,28 @@ describe('messageHandler', function(){
         it('message handler names are case insensitive', async function(){
             expect(await handler.handle('RDS this is A Sample'))
                 .toEqual('handleRds this is A Sample')
+        })
+
+        it('returns help message when handler returns invalid parameters', async function(){
+            serviceHandlers.tesla = {
+                handle: async (messageBody) => {
+                    return errorCodes.INVALID_PARAMETERS
+                }
+            }
+
+            expect(await handler.handle('TESLA run fast'))
+                .toEqual('HELP ')
+        })
+
+        it('returns handler errors', async function(){
+            serviceHandlers.sql = {
+                handle: async (messageBody) => {
+                    throw new Error('cannot connect')
+                }
+            }
+
+            expect(await handler.handle('SQL db connection'))
+                .toEqual('ERROR cannot connect')
         })
     })
 })
