@@ -17,11 +17,41 @@ describe('messageHandler', function(){
     })
 
     it ('fails when no help handler is configured', function() {
-        expect(() => { messageHandler({}) }).toThrow(new Error('Help handler required'))
+        expect(() => { messageHandler({})     }).toThrow(new Error('Help handler required'))
     })
 
-    it('sends messages to the help handle by default', async function(){
-        const result = await handler.handle('blah')
-        expect(result).toBe('HELP blah');
+    describe('when no handlers are configured', function(){
+        it('sends messages to the help handler by default', async function() {
+            expect(await handler.handle('blah'))
+                .toBe('HELP blah')
+        })
+
+        it('sends empty messages to the help handler', async function() {
+            expect(await handler.handle(''))
+                .toBe('HELP ')
+        })
+    })
+
+    describe('when handlers are configured', function() {
+        beforeEach(function(){
+            serviceHandlers.lambda = {
+                handle: async (messageBody) => {
+                    return `handledLambda ${messageBody}`
+                }
+            }
+
+            serviceHandlers.rds = {
+                handle: async (messageBody) => {
+                    return `handledRds ${messageBody}`
+                }
+            }
+        })
+
+        it('sends messages to the help handle by default', async function() {
+            expect(await handler.handle('blah'))
+                .toBe('HELP blah')
+        })
+
+        })
     })
 })
