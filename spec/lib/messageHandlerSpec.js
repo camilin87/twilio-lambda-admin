@@ -23,12 +23,12 @@ describe('messageHandler', function(){
     describe('when no handlers are configured', function(){
         it('sends messages to the help handler by default', async function() {
             expect(await handler.handle('blah'))
-                .toBe('HELP blah')
+                .toEqual('HELP blah')
         })
 
         it('sends empty messages to the help handler', async function() {
             expect(await handler.handle(''))
-                .toBe('HELP ')
+                .toEqual('HELP ')
         })
     })
 
@@ -36,22 +36,45 @@ describe('messageHandler', function(){
         beforeEach(function(){
             serviceHandlers.lambda = {
                 handle: async (messageBody) => {
-                    return `handledLambda ${messageBody}`
+                    return `handleLambda ${messageBody}`
                 }
             }
 
             serviceHandlers.rds = {
                 handle: async (messageBody) => {
-                    return `handledRds ${messageBody}`
+                    return `handleRds ${messageBody}`
                 }
             }
         })
 
-        it('sends messages to the help handle by default', async function() {
+        it('sends messages to the help handler by default', async function() {
             expect(await handler.handle('blah'))
-                .toBe('HELP blah')
+                .toEqual('HELP blah')
         })
 
+        it('sends help message to the help handler by default', async function() {
+            expect(await handler.handle('help whatever'))
+                .toEqual('HELP help whatever')
+        })
+
+        it('sends gibberish help handler', async function() {
+            expect(await handler.handle('lambdablah test'))
+                .toEqual('HELP lambdablah test')
+        })
+
+        it('sends empty message to the specified lambda', async function(){
+            expect(await handler.handle('lambda'))
+                .toEqual('handleLambda ')
+        })
+
+        it('sends message to the specified lambda', async function(){
+            expect(await handler.handle('lambda test1'))
+                .toEqual('handleLambda test1')
+        })
+
+        it('message handler names are case insensitive', async function(){
+            expect(await handler.handle('RDS this is A Sample'))
+                .toEqual('handleRds this is A Sample')
         })
     })
 })
