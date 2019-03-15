@@ -18,9 +18,14 @@
   },
   "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "test": "jasmine"
   },
   "dependencies": {
-    "aws-automation-utils": "1.1.0"
+    "aws-automation-utils": "1.1.0",
+    "rfr": "^1.2.3"
+  },
+  "devDependencies": {
+    "jasmine": "^3.3.1"
   }
 }
