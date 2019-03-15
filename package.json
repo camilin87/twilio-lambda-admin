@@ -19,5 +19,8 @@
   "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme",
   "scripts": {
     "start": "node main.js"
+  },
+  "dependencies": {
+    "aws-automation-utils": "1.1.0"
   }
 }
