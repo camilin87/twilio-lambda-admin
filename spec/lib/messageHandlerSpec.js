@@ -3,15 +3,25 @@ const messageHandler = rfr('lib/messageHandler')
 
 describe('messageHandler', function(){
     var handler = null
-    var settingsReaderMock = null
-    var lambdaMock = null
+    var serviceHandlers = null
 
     beforeEach(function() {
-        handler = messageHandler(settingsReaderMock, lambdaMock)
+        serviceHandlers = {
+            help: {
+                handle: async (messageBody) => {
+                    return `HELP ${messageBody}`
+                }
+            }
+        }
+        handler = messageHandler(serviceHandlers)
     })
 
-    it('returns false by default', async function(){
+    it ('fails when no help handler is configured', function() {
+        expect(() => { messageHandler({}) }).toThrow(new Error('Help handler required'))
+    })
+
+    it('sends messages to the help handle by default', async function(){
         const result = await handler.handle('blah')
-        expect(result).toBe(false);
+        expect(result).toBe('HELP blah');
     })
 })
