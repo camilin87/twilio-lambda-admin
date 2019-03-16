@@ -23,7 +23,7 @@
     "test-debug": "node --inspect-brk ./node_modules/.bin/jasmine # open chrome://inspect"
   },
   "dependencies": {
-    "aws-automation-utils": "1.1.0",
+    "aws-automation-utils": "1.4.0",
     "rfr": "^1.2.3"
   },
   "devDependencies": {
