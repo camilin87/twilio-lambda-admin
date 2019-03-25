@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/camilin87/twilio-lambda-admin#readme",
   "scripts": {
-    "start": "node main.js",
     "test": "jasmine",
     "test-debug": "node --inspect-brk ./node_modules/.bin/jasmine # open chrome://inspect"
   },
