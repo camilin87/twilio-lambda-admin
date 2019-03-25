@@ -62,7 +62,13 @@ describe('handleCommandController', () => {
 
         var actual = await controller.process(input)
 
-        expect(actual).toEqual({ statusCode: 200, body: 'success' })
+        expect(actual).toEqual({
+            statusCode: 200,
+            body: 'success',
+            headers: {
+                'Content-type': 'text/plain'
+            }
+        })
         expect(parseBodyRequest).toBe(input)
         expect(isValidRequest).toBe(input)
         expect(handleRequest).toBe('sample message request')
@@ -73,7 +79,13 @@ describe('handleCommandController', () => {
 
         var actual = await controller.process({ field1: 'value1' })
 
-        expect(actual).toEqual({ statusCode: 400, body: '' })
+        expect(actual).toEqual({
+            statusCode: 400,
+            body: '',
+            headers: {
+                'Content-type': 'text/plain'
+            }
+        })
     })
 
     it ('returns 500 on unexpected errors', async () => {
@@ -84,6 +96,12 @@ describe('handleCommandController', () => {
 
         var actual = await controller.process({ field1: 'value1' })
 
-        expect(actual).toEqual({ statusCode: 500, body: 'Unexpected error' })
+        expect(actual).toEqual({
+            statusCode: 500,
+            body: 'Unexpected error',
+            headers: {
+                'Content-type': 'text/plain'
+            }
+        })
     })
 })
