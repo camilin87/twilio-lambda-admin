@@ -1,17 +1,4 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
-service: twilio-lambda-admin # NOTE: update this with your service name
+service: twilio-lambda-admin
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -20,10 +7,13 @@ service: twilio-lambda-admin # NOTE: update this with your service name
 provider:
   name: aws
   runtime: nodejs8.10
-
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+  region: ${opt:region, 'us-east-2'}
+  stage: ${opt:stage, 'dev'}
+  twilioAccountSid: ${opt:twilioAccountSid, 'TWILIO_ACCOUNT_SID_GOES_HERE'}
+  twilioAuthToken: ${opt:twilioAuthToken, 'TWILIO_AUTH_TOKEN_GOES_HERE'}
+  alarmErrorThreshold: ${opt:alarmErrorThreshold, '1'}
+  alarmWarnThreshold: ${opt:alarmWarnThreshold, '5'}
+  alarmInterval: ${opt:alarmInterval, '10'}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -54,52 +44,84 @@ provider:
 #    - exclude-me.js
 #    - exclude-me-dir/**
 
+custom:
+  metricsNamespace: "${self:service}-${self:provider.stage}"
+
 functions:
-  hello:
-    handler: sampleHandler.hello
+  HandlerCommand:
+    handler: handlerCommand.process
+    timeout: 30
+    events:
+      - http:
+          path: /v1/command
+          method: post
 
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
-#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
+resources:
+  Resources:
+    HandlerCommandLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        RetentionInDays: "365"
+    HandlerCommandLogGroupErrorMetricFilter:
+      Type: AWS::Logs::MetricFilter
+      Properties:
+        LogGroupName:
+          Ref: HandlerCommandLogGroup
+        FilterPattern: "ERROR"
+        MetricTransformations:
+          - MetricValue: "1"
+            DefaultValue: "0"
+            MetricNamespace: ${self:custom.metricsNamespace}
+            MetricName: "ErrorCount"
+    HandlerCommandLogGroupWarnMetricFilter:
+      Type: AWS::Logs::MetricFilter
+      Properties:
+        LogGroupName:
+          Ref: HandlerCommandLogGroup
+        FilterPattern: "WARN"
+        MetricTransformations:
+          - MetricValue: "1"
+            DefaultValue: "0"
+            MetricNamespace: ${self:custom.metricsNamespace}
+            MetricName: "WarningCount"
+    HandlerCommandLogGroupInfoMetricFilter:
+      Type: AWS::Logs::MetricFilter
+      Properties:
+        LogGroupName:
+          Ref: HandlerCommandLogGroup
+        FilterPattern: "INFO"
+        MetricTransformations:
+          - MetricValue: "1"
+            DefaultValue: "0"
+            MetricNamespace: ${self:custom.metricsNamespace}
+            MetricName: "InfoCount"
+    AlarmsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: "${self:service}-alarms-${self:provider.stage}"
+        TopicName: "${self:service}-alarms-${self:provider.stage}"
 
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+    AlarmError:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmActions:
+          - Ref: AlarmsTopic
+        MetricName: ErrorCount
+        Namespace: ${self:custom.metricsNamespace}
+        Statistic: Sum
+        Period: ${self:provider.alarmInterval}
+        EvaluationPeriods: '1'
+        Threshold: ${self:provider.alarmErrorThreshold}
+        ComparisonOperator: GreaterThanThreshold
+    AlarmWarn:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmActions:
+          - Ref: AlarmsTopic
+        MetricName: WarningCount
+        Namespace: ${self:custom.metricsNamespace}
+        Statistic: Sum
+        Period: ${self:provider.alarmInterval}
+        EvaluationPeriods: '1'
+        Threshold: ${self:provider.alarmWarnThreshold}
+        ComparisonOperator: GreaterThanThreshold
