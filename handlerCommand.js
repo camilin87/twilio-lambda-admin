@@ -1,16 +1,41 @@
-'use strict';
+const rfr = require('rfr')
+const handleCommandControllerFn = rfr('lib/handleCommandController')
+const requestValidatorFn = rfr('lib/requestValidator')
+const requestParserFn = rfr('lib/requestParser')
+const messageHandlerFn = rfr('lib/messageHandler')
+const messageHandlerHelpFn = rfr('lib/messageHandlers/help') 
+const messageHandlerLambdaFn = rfr('lib/messageHandlers/lambda')
+const settingsReaderFn = rfr('lib/settingsReader')
+const twilioRequestValidatorFn = rfr('lib/twilioRequestValidator')
+const phoneNumberValidatorFn = rfr('lib/phoneNumberValidator')
+const lambdaHelper = require('aws-automation-utils').lambda
 
-module.exports.process = async (event) => {
-    console.log('INFO HandlerCommand; request: ', event);
+function createController(){
+    const requestParser = requestParserFn()
+    const settingsReader = settingsReaderFn()
+    const twilioRequestValidator = twilioRequestValidatorFn()
+    const phoneNumberValidator = phoneNumberValidatorFn(settingsReader)
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            message: 'Go Serverless v1.0! Your function executed successfully!',
-            input: event,
-        }),
-    };
+    const requestValidator = requestValidatorFn(
+        settingsReader, requestParser, twilioRequestValidator, phoneNumberValidator
+    )
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
-};
+    const messageHandler = messageHandlerFn({
+        help: messageHandlerHelpFn(),
+        lambda: messageHandlerLambdaFn(settingsReader, lambdaHelper)
+    })
+    return handleCommandControllerFn(
+        requestValidator, requestParser, messageHandler
+    )
+}
+
+module.exports.process = async (request) => {
+    console.log('INFO HandlerCommand; request:', request)
+    const controller = createController()
+
+    var result = await controller.process(request)
+
+    console.log('INFO HandlerCommand; result:', result)
+
+    return result;
+}
