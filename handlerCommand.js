@@ -30,7 +30,7 @@ function createController(){
 }
 
 module.exports.process = async (request) => {
-    console.log('INFO HandlerCommand; request:', request)
+    console.log('DEBUG HandlerCommand; request:', request)
     const controller = createController()
 
     var result = await controller.process(request)
