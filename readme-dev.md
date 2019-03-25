@@ -17,5 +17,5 @@ Prerequisites: Set the environment variables for the twilio credentials
 Execute the deployment:  
 
 ```bash
-sls deploy
+sls deploy --twilioAccountSid=${TWILIO_ACCOUNT_SID} --twilioAuthToken=${TWILIO_AUTH_TOKEN}
 ```

@@ -55,6 +55,9 @@ functions:
       - http:
           path: /v1/command
           method: post
+    environment:
+      TWILIO_ACCOUNT_SID: ${self:provider.twilioAccountSid}
+      TWILIO_AUTH_TOKEN: ${self:provider.twilioAuthToken}
 
 resources:
   Resources:
