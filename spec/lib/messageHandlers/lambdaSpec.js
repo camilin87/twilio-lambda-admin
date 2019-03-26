@@ -68,9 +68,9 @@ describe('lambda', function(){
                 .toEqual(errorCodes.INVALID_PARAMETERS)
         })
 
-        it ('returns INVALID_PARAMETERS when no value is specified', async function(){
+        it ('sets the variable to empty when no value is specified', async function(){
             expect(await handler.handle('env function1 RUN_FAST'))
-                .toEqual(errorCodes.INVALID_PARAMETERS)
+                .toEqual('{"region":"my-region-1","functionName":"function1","key":"RUN_FAST","value":"","zType":"updateEnvironment"}')
         })
 
         it ('configures the environment value', async function(){
