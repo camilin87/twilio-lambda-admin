@@ -1,5 +1,7 @@
 # twilio-lambda-admin  
 
+[![Build Status](https://travis-ci.org/camilin87/twilio-lambda-admin.svg?branch=master)](https://travis-ci.org/camilin87/twilio-lambda-admin)
+
 Twilio lambda backend to automate other lambda projects
 
 ## Configuration  
