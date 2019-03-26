@@ -3,8 +3,8 @@ Twilio lambda backend to automate other lambda projects
 
 ## Configuration  
 - Deploy the project  
-- Create an S3 file with the configuration  
 - Create a twilio number and point it to the lambda  
+- Add `PHONE_0`, `PHONE_1`... etc environment variables for the numbers allowed to invoke the function. Numbers should be saved in the form `+130530512345`.  
 
 ## Usage  
 
