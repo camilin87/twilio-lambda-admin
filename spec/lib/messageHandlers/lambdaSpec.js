@@ -77,6 +77,11 @@ describe('lambda', function(){
             expect(await handler.handle('env function1 RUN_FAST true'))
                 .toEqual('{"region":"my-region-1","functionName":"function1","key":"RUN_FAST","value":"true","zType":"updateEnvironment"}')
         })
+
+        it ('configures environment values with spaces', async function(){
+            expect(await handler.handle('env function1 RUN_FAST true or maybe not'))
+                .toEqual('{"region":"my-region-1","functionName":"function1","key":"RUN_FAST","value":"true or maybe not","zType":"updateEnvironment"}')
+        })
     })
 
     describe('enable', function(){
